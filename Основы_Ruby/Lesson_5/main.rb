@@ -11,6 +11,18 @@ loop do
     program.creating_train
   when 3
     puts program.rours_menu
-    program.actions_on_routes(gets.to_i)
+    program.actions_on_routes(gets.to_i)    
+  when 4    
+    program.assign_train_route  
+  when 5
+    program.add_wagon_train
+  when 6
+    program.unhook_wagon_train
+  when 7
+    program.move_train
+  when 8
+    program.stations_and_trains_on_them
   end
+
+
 end

@@ -8,8 +8,4 @@ class PassengerTrain < Train
     @type  = :passenger
     super(number)
   end
-
-  def add_wagon(wagon)
-    super(wagon) if wagon.type == self.type
-  end
 end

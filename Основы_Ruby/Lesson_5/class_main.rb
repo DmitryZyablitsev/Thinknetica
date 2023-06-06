@@ -12,9 +12,72 @@ class Main
     @trains = []
     @stations = []
     @routes = []
-    @stations << Station.new('UK') << Station.new('UFA') << Station.new('Moscow') << Station.new('SPB') << Station.new('EKB') << Station.new('Челябинск')
-    @routes << Route.new(@stations[2], @stations[4]) << Route.new(@stations[0], @stations[1]) << Route.new(@stations[5], @stations[3])
-    # ...    
+    # @stations << Station.new('UK') << Station.new('UFA') << Station.new('Moscow') << Station.new('SPB') << Station.new('EKB') << Station.new('Челябинск')
+    # @routes << Route.new(@stations[2], @stations[4]) << Route.new(@stations[0], @stations[1]) << Route.new(@stations[5], @stations[3])
+    # @routes[1].add_station(1, @stations[4])
+    # @trains << CargoTrain.new('#37') << CargoTrain.new('#51') << PassengerTrain.new('R94') << PassengerTrain.new('D102')
+  end
+
+  def actions_on_routes(chois)
+    case chois
+    when 1
+      puts 'Введите номер первой станции'
+      get_names(@stations, :name)
+      first_station = @stations[gets.to_i]
+      puts 'Введите номер последний станции'      
+      last_station = @stations[gets.to_i]
+      @routes << Route.new(first_station, last_station)
+    when 2
+      puts 'Выберите маршрут'
+      get_names(@routes, :name)
+      @current_route = @routes[gets.to_i] # исправить @current_route
+      puts 'Маршрут состоит из следующих станций:'
+      get_names(@current_route.stations, :name)
+      puts'      1. Добавить станцию к маршруту
+      2. Удалить станцию'
+      add_and_delete_station_in_routes(gets.to_i)
+    end
+  end
+
+  def add_and_delete_station_in_routes(choice)
+    case choice
+    when 1
+      puts 'Выберите станцию для добавления в маршрут'
+      get_names(@stations, :name)
+      station = @stations[gets.to_i]
+      puts 'Выберите место в маршруте'
+      get_names(@current_route.stations, :name)
+      index = gets.to_i
+      @current_route.add_station(index,station)
+    when 2
+      puts 'Выберите станцию для удаления (кроме первой и последней)'
+      get_names(@current_route.stations, :name)
+      @current_route.delete_station(@current_route.stations[gets.to_i])
+    end
+  end
+
+  def add_wagon_train
+    puts 'Выберите поезд'
+    selected_train = choice_train
+    case selected_train.type
+    when :passenger      
+      selected_train.add_wagon(PassengerWagon.new)
+    when :cargo
+      selected_train.add_wagon(CargoWagon.new)
+    end 
+  end
+
+  def assign_train_route
+    puts 'Выберите поезд'    
+    selected_train = choice_train
+    puts 'Выберите маршрут'
+    get_names(@routes, :name)
+    selected_train.assign_route(@routes[gets.to_i]) # поезд получил маршрут
+  end
+
+  def choice_train
+    get_names(@trains, :number)        
+    @trains[gets.to_i] 
   end
 
   def create_station()
@@ -38,6 +101,10 @@ class Main
     end
   end
 
+  def get_names (arr, attribute_name)
+    arr.each_index {|index| puts "#{index}. #{arr[index].public_send(attribute_name)}" }
+  end 
+
   def main_menu
     '    1. Создать станцию
     2. Создать поезд
@@ -45,9 +112,23 @@ class Main
     4. Назначить маршрут поезду
     5. Добавить вагон к поезду
     6. Отцепить вагон от поезда
-    7. Переместить поезд по маршруту вперед
-    8. Переместить поезд по маршруту назад
-    9. Просматреть список станций и список поездов на станции'
+    7. Переместить поезд по маршруту
+    8. Просмотреть список станций и список поездов на станции'
+  end
+
+  def move_train
+    puts 'Выберите поезд'
+    selected_train = choice_train
+    puts '    Переместить поезд на одну станцию
+    1. Вперед
+    2. Назад'
+    case gets.to_i
+    when 1
+      selected_train.move_next_station
+    when 2      
+        selected_train.move_previous_station      
+    end
+    p selected_train.current_station
   end
 
   def rours_menu
@@ -55,46 +136,15 @@ class Main
     2. Редактировать маршрут'
   end
 
-  def actions_on_routes(chois)
-    case chois
-    when 1
-      puts 'Введите номер первой станции'
-      get_names(@stations)
-      first_station = @stations[gets.to_i]
-      puts 'Введите номер последний станции'      
-      last_station = @stations[gets.to_i]
-      @routes << Route.new(first_station, last_station)
-    when 2
-      puts 'Выберите маршрут'
-      get_names(@routes)
-      @current_route = @routes[gets.to_i] # исправить @current_route
-      puts 'Маршрут состоит из следующих станций:'
-      get_names(@current_route.stations)
-      puts'      1. Добавить станцию к маршруту
-      2. Удалить станцию'
-      add_and_delete_station_in_routes(gets.to_i)
+  def stations_and_trains_on_them      
+    @stations.each do |station|
+      puts "#{station.name}:"
+      station.trains.each{|train| puts "\t#{train.number}"}
     end
   end
 
-  def get_names (arr)
-    arr.each_index {|index| puts "#{index}. #{arr[index].name}" }
-  end
-
-  def add_and_delete_station_in_routes(choice)
-    case choice
-    when 1
-      puts 'Выберите станцию для добавления в маршрут'
-      get_names(@stations)
-      station = @stations[gets.to_i]
-      puts 'Выберите место в маршруте'
-      get_names(@current_route.stations)
-      index = gets.to_i
-      @current_route.add_station(index,station)
-    when 2
-      puts 'Выберите станцию для удаления (кроме первой и последней)'
-      get_names(@current_route.stations)
-      @current_route.delete_station(@current_route.stations[gets.to_i])
-    end
-
+  def unhook_wagon_train 
+    puts 'Выберите поезд'
+    choice_train.unhook_wagon
   end
 end
