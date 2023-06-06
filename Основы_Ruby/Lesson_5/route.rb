@@ -1,5 +1,5 @@
 class Route
-  attr_accessor :stations, :name
+  attr_reader :stations, :name
 
   def initialize (first_station, last_station)
     @name = "#{first_station.name} - #{last_station.name}"

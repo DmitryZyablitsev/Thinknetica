@@ -1,6 +1,5 @@
-class Train
-  attr_accessor :speed, :current_station_index
-  attr_reader :number, :route, :wagons
+class Train 
+  attr_reader :number, :route, :wagons, :speed
 
   def initialize(number)
     @number = number
@@ -59,5 +58,7 @@ class Train
   def unhook_wagon
     @wagons.pop
   end
- 
+
+  private 
+  attr_accessor :current_station_index
 end

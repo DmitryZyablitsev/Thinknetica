@@ -8,6 +8,7 @@ require_relative 'route'
 class Main
   
   attr_reader :stations, :trains, :routes
+
   def initialize()
     @trains = []
     @stations = []
@@ -39,23 +40,6 @@ class Main
     end
   end
 
-  def add_and_delete_station_in_routes(choice)
-    case choice
-    when 1
-      puts 'Выберите станцию для добавления в маршрут'
-      get_names(@stations, :name)
-      station = @stations[gets.to_i]
-      puts 'Выберите место в маршруте'
-      get_names(@current_route.stations, :name)
-      index = gets.to_i
-      @current_route.add_station(index,station)
-    when 2
-      puts 'Выберите станцию для удаления (кроме первой и последней)'
-      get_names(@current_route.stations, :name)
-      @current_route.delete_station(@current_route.stations[gets.to_i])
-    end
-  end
-
   def add_wagon_train
     puts 'Выберите поезд'
     selected_train = choice_train
@@ -73,11 +57,6 @@ class Main
     puts 'Выберите маршрут'
     get_names(@routes, :name)
     selected_train.assign_route(@routes[gets.to_i]) # поезд получил маршрут
-  end
-
-  def choice_train
-    get_names(@trains, :number)        
-    @trains[gets.to_i] 
   end
 
   def create_station()
@@ -101,10 +80,6 @@ class Main
     end
   end
 
-  def get_names (arr, attribute_name)
-    arr.each_index {|index| puts "#{index}. #{arr[index].public_send(attribute_name)}" }
-  end 
-
   def main_menu
     '    1. Создать станцию
     2. Создать поезд
@@ -113,7 +88,8 @@ class Main
     5. Добавить вагон к поезду
     6. Отцепить вагон от поезда
     7. Переместить поезд по маршруту
-    8. Просмотреть список станций и список поездов на станции'
+    8. Просмотреть список станций и список поездов на станции
+    9. Выход'
   end
 
   def move_train
@@ -128,7 +104,6 @@ class Main
     when 2      
         selected_train.move_previous_station      
     end
-    p selected_train.current_station
   end
 
   def rours_menu
@@ -147,4 +122,33 @@ class Main
     puts 'Выберите поезд'
     choice_train.unhook_wagon
   end
+
+  protected 
+
+    def add_and_delete_station_in_routes(choice)
+    case choice
+    when 1
+      puts 'Выберите станцию для добавления в маршрут'
+      get_names(@stations, :name)
+      station = @stations[gets.to_i]
+      puts 'Выберите место в маршруте'
+      get_names(@current_route.stations, :name)
+      index = gets.to_i
+      @current_route.add_station(index,station)
+    when 2
+      puts 'Выберите станцию для удаления (кроме первой и последней)'
+      get_names(@current_route.stations, :name)
+      @current_route.delete_station(@current_route.stations[gets.to_i])
+    end
+  end
+
+  def choice_train
+    get_names(@trains, :number)        
+    @trains[gets.to_i] 
+  end
+
+  def get_names (arr, attribute_name)
+    arr.each_index {|index| puts "#{index}. #{arr[index].public_send(attribute_name)}" }
+  end 
+
 end

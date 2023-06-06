@@ -22,6 +22,8 @@ loop do
     program.move_train
   when 8
     program.stations_and_trains_on_them
+  when 9
+    abort
   end
 
 
