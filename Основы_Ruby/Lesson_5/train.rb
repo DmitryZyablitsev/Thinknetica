@@ -1,11 +1,10 @@
 class Train 
-  attr_reader :number, :route, :wagons, :speed
+  attr_reader :number, :route, :wagons, :speed, :type
 
   def initialize(number)
     @number = number
     @speed = 0
-    @wagons = []
-    
+    @wagons = []    
   end
 
   def gain_speed (speed)
@@ -28,7 +27,6 @@ class Train
       self.next_station.accept_train(self)
       self.current_station_index += 1
     end
-
   end
 
   def move_previous_station 
@@ -52,7 +50,8 @@ class Train
   end
 
   def add_wagon(wagon)
-    wagon.type.nil? ? (@wagons << wagon if speed == 0) : (@wagons << wagon if speed == 0 && wagon.type == self.type)
+    return unless speed.zero?
+    @wagons << wagon if wagon.type == type
   end
 
   def unhook_wagon
