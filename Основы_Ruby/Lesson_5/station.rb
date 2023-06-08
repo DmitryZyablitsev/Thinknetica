@@ -1,9 +1,18 @@
-class Station  
+class Station
+  
+  def self.all    
+    @@stations
+  end
+  @@stations = []
+
   attr_reader :name, :trains
-  def initialize(name)
+  
+  def initialize(name)    
     @name = name
     @trains = []
+    @@stations << self
   end
+  
 
   def accept_train(train)
     trains << train
@@ -17,3 +26,7 @@ class Station
     trains.delete(train)
   end
 end
+
+Station.new('UK')
+Station.new('UFA')
+p Station.all

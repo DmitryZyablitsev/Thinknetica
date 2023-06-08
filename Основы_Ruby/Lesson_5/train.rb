@@ -1,10 +1,17 @@
+require_relative 'module/manufacturer'
+require_relative 'module/instance_counter'
 class Train 
+  include Manufacturer
+  include InstanceCounter
   attr_reader :number, :route, :wagons, :speed, :type
+  
 
   def initialize(number)
     @number = number
     @speed = 0
-    @wagons = []    
+    @wagons = []
+    @@all << self  
+    self.register_instance  
   end
 
   def gain_speed (speed)
@@ -58,6 +65,20 @@ class Train
     @wagons.pop
   end
 
+  def self.find(number)
+    @@all.select{ |train| train.number == number}
+  end
+
   private 
   attr_accessor :current_station_index
+  @@all = []
 end
+
+tr1 = Train.new('#44')
+tr2 = Train.new('#45')
+tr3 = Train.new('#47')
+tr4 = Train.new('#48')
+
+Train.find('#47')
+p Train.instances()
+
