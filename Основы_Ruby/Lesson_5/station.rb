@@ -1,5 +1,6 @@
+require_relative 'module/instance_counter'
 class Station
-  
+  include InstanceCounter
   def self.all    
     @@stations
   end
@@ -11,6 +12,7 @@ class Station
     @name = name
     @trains = []
     @@stations << self
+    register_instance
   end
   
 
@@ -26,7 +28,3 @@ class Station
     trains.delete(train)
   end
 end
-
-Station.new('UK')
-Station.new('UFA')
-p Station.all

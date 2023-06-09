@@ -11,7 +11,7 @@ class Train
     @speed = 0
     @wagons = []
     @@all << self  
-    self.register_instance  
+    register_instance 
   end
 
   def gain_speed (speed)
@@ -73,12 +73,3 @@ class Train
   attr_accessor :current_station_index
   @@all = []
 end
-
-tr1 = Train.new('#44')
-tr2 = Train.new('#45')
-tr3 = Train.new('#47')
-tr4 = Train.new('#48')
-
-Train.find('#47')
-p Train.instances()
-

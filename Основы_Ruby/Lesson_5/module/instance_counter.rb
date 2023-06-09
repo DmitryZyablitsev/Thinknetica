@@ -2,16 +2,31 @@ module InstanceCounter
 
   def self.included(base)
     base.extend ClassMethods
-    base.class_variable_set(:@@count_intance, 0)
+    base.include ClassInstanse
+    base.class_variable_set(:@@instance_count, 0)
   end
-  
-
-  define_method(:register_instance, { @@count_intance += 1})
 
   module ClassMethods
-    
     def instances
-      @@count_intance
+      self.class_variable_get(:@@instance_count)
+    end
+  end
+
+  module ClassInstanse
+    private
+    def register_instance
+      counter = self.class.class_variable_get(:@@instance_count)
+      counter += 1
+      self.class.class_variable_set(:@@instance_count, counter)
     end
   end
 end
+
+class Train 
+  include InstanceCounter  
+  def initialize
+    register_instance    
+  end
+end
+
+
