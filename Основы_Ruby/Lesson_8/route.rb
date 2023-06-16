@@ -12,7 +12,11 @@ class Route
   end
 
   def add_station(index, station)
-    stations.insert(index, station) if index > 0 and index < stations.size
+    if index > 0 and index < stations.size
+      stations.insert(index, station)
+    else
+      raise 'Ошибка, станции было присвоено не подходящее место'
+    end
   end
 
   def delete_station(station)

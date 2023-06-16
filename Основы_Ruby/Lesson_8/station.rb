@@ -1,4 +1,5 @@
 require_relative 'module/instance_counter'
+require_relative 'train'
 class Station
   include InstanceCounter
   def self.all    
@@ -21,6 +22,8 @@ class Station
     trains << train
   end
 
+  
+
   def trains_by_type(type)
     trains.select{ |train| train.type == type }
   end
@@ -36,11 +39,22 @@ class Station
     false
   end
 
+  def each_train
+    for i in @trains
+      yield i
+    end
+  end
+
   private
   def validate!(name)    
     raise 'Название станции должно быть 2 и больше символов' if name.size < 2    
   end
 end
-
-# p st = Station.new('22')
-# p st.valid?
+# t1 = Train.new('111-11')
+# t2 = Train.new('222-22')
+# t3 = Train.new('333-33')
+# st = Station.new('UK')
+# st.accept_train(t1)
+# st.accept_train(t2)
+# st.accept_train(t3)
+# st.each_train{|el| el.gain_speed(70); p el }

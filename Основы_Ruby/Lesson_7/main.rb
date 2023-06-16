@@ -14,10 +14,10 @@ class Main
     @trains = []
     @stations = []
     @routes = []
-    #@stations << Station.new('UK') << Station.new('UFA') << Station.new('Moscow') << Station.new('SPB') << Station.new('EKB') << Station.new('Челябинск')
-    # @routes << Route.new(@stations[2], @stations[4]) << Route.new(@stations[0], @stations[1]) << Route.new(@stations[5], @stations[3])
-    # @routes[1].add_station(1, @stations[4])
-    # @trains << CargoTrain.new('#37') << CargoTrain.new('#51') << PassengerTrain.new('R94') << PassengerTrain.new('D102')
+    @stations << Station.new('UK') << Station.new('UFA') << Station.new('Moscow') << Station.new('SPB') << Station.new('EKB') << Station.new('Челябинск')
+    @routes << Route.new(@stations[2], @stations[4]) << Route.new(@stations[0], @stations[1]) << Route.new(@stations[5], @stations[3])
+    @routes[1].add_station(1, @stations[4])
+    @trains << CargoTrain.new('АНА-37') << CargoTrain.new('УФА-17') << PassengerTrain.new('МСК-УК') << PassengerTrain.new('43Е-к4')
   end
 
   def actions_on_routes(chois)
@@ -32,6 +32,7 @@ class Main
         puts error
         retry
       end
+
       begin
       puts 'Введите номер последний станции'
       get_names(@stations, :name)   
@@ -42,6 +43,7 @@ class Main
         puts error
         retry
       end
+
     when 2
       begin 
       puts 'Выберите маршрут'
@@ -52,11 +54,13 @@ class Main
         puts error
         retry
       end
+
       puts 'Маршрут состоит из следующих станций:'
       get_names(@current_route.stations, :name)
       puts'      1. Добавить станцию к маршруту
       2. Удалить станцию'
       add_and_delete_station_in_routes(gets.to_i)
+
     else     
       puts 'Введены не коректные данные'       
     end
@@ -64,27 +68,31 @@ class Main
 
   def add_wagon_train
     puts 'Выберите поезд'
-    selected_train = choice_train
+    selected_train = choice_train!
     case selected_train.type
     when :passenger      
       selected_train.add_wagon(PassengerWagon.new)
     when :cargo
       selected_train.add_wagon(CargoWagon.new)
-    end 
-    p selected_train.wagons
+    end    
   end
 
   def assign_train_route
-    puts 'Выберите поезд'    
-    selected_train = choice_train
-    puts 'Выберите маршрут'
-    get_names(@routes, :name)
-    selected_train.assign_route(@routes[gets.to_i]) # поезд получил маршрут
+    puts 'Выберите поезд'
+    selected_train = choice_train!
+    begin
+      puts 'Выберите маршрут'
+      get_names(@routes, :name)
+      selected_train.assign_route(@routes[gets.to_i]) # поезд получил маршрут      
+    rescue NoMethodError
+      puts 'Ошибка ввода'
+      retry
+    end
   end
 
-  def create_station()
-    puts 'Введите название станции'
+  def create_station
     begin
+    puts 'Введите название станции'    
       @stations << Station.new(gets.chomp!)
       puts 'Станция создана'
     rescue RuntimeError => error
@@ -98,14 +106,14 @@ class Main
     1. Пассажирский
     2. Грузовой'
     case gets.to_i
-    when 1      
-      puts 'Введеите номер поезда'
-      begin
+    when 1
+      begin    
+        puts 'Введеите номер поезда'      
         current_train = PassengerTrain.new(gets.chomp!)
         trains << current_train
         puts "Пассажирский поезд #{current_train.number} создан"
-      rescue RuntimeError => eror
-        puts eror
+      rescue RuntimeError => error
+        puts error
         retry 
       end
     when 2
@@ -114,8 +122,8 @@ class Main
         current_train = CargoTrain.new(gets.chomp!) 
         trains << current_train
         puts "Грузовой поезд #{current_train.number} создан"
-      rescue RuntimeError => eror
-        puts eror
+      rescue RuntimeError => error
+        puts error
         retry 
       end
     else
@@ -139,7 +147,7 @@ class Main
 
   def move_train
     puts 'Выберите поезд'
-    selected_train = choice_train
+    selected_train = choice_train!
     puts '    Переместить поезд на одну станцию
     1. Вперед
     2. Назад'
@@ -165,12 +173,12 @@ class Main
 
   def unhook_wagon_train 
     puts 'Выберите поезд'
-    choice_train.unhook_wagon
+    choice_train!.unhook_wagon
   end
 
   protected 
 
-    def add_and_delete_station_in_routes(choice)
+  def add_and_delete_station_in_routes(choice)
     case choice
     when 1
       puts 'Выберите станцию для добавления в маршрут'
@@ -187,9 +195,14 @@ class Main
     end
   end
 
-  def choice_train
-    get_names(@trains, :number)        
-    @trains[gets.to_i] 
+  def choice_train!
+    get_names(@trains, :number)    
+      current_train = @trains[gets.to_i]
+      raise 'Ошибка ввода, такого поезда на существует. Выберите поезд' if current_train == nil
+      return current_train
+    rescue RuntimeError => error
+      puts error
+      retry
   end
 
   def get_names (arr, attribute_name)

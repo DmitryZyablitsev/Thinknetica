@@ -1,5 +1,7 @@
 require_relative 'module/manufacturer'
 require_relative 'module/instance_counter'
+require_relative 'passenger_wagon'
+require_relative 'wagon'
 class Train 
   include Manufacturer
   include InstanceCounter
@@ -15,7 +17,7 @@ class Train
   end
 
   def gain_speed (speed)
-    self.speed = speed
+    @speed = speed
   end
 
   def brake
@@ -76,6 +78,12 @@ class Train
     false
   end
 
+  def each_wagon
+    for i in @wagons
+      yield i
+    end
+  end
+
   private 
   attr_accessor :current_station_index
   @@all = []
@@ -87,5 +95,13 @@ class Train
   end
 end
 
-# p st = Train.new('EQW32')
-# p st.valid?
+# st = Train.new('ККН32')
+# w1 = Wagon.new
+# w3 = Wagon.new
+# w2 = Wagon.new
+# st.type
+# st.add_wagon(w1)
+# st.add_wagon(w2)
+# st.add_wagon(w3)
+
+# p st.each_wagon{|el| p el}
