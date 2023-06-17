@@ -1,19 +1,20 @@
 require_relative 'wagon'
 class PassengerWagon
-  attr_reader :type, :number_of_seats, :available_seats
+  attr_reader :type, :number_of_seats, :occupied_seats
   def initialize(number_of_seats)
     @type = :passenger
     @number_of_seats = number_of_seats  # Количество мест
-    @available_seats = number_of_seats  # Свободные места
-    #@occupied_seats = 0                # Занятые места
+    #@available_seats = number_of_seats  # Свободные места
+    @occupied_seats = 0                # Занятые места
   end
 
   def take_a_seat # Занять место
-    @available_seats -= 1    
+    raise 'Свободных мест нет' if  @occupied_seats == @number_of_seats
+    @occupied_seats += 1    
   end 
 
-  def occupied_seats
-    @number_of_seats - @available_seats
+  def available_seats
+    @number_of_seats - @occupied_seats
   end
 end
 

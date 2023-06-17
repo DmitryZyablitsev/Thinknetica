@@ -78,10 +78,8 @@ class Train
     false
   end
 
-  def each_wagon
-    for i in @wagons
-      yield i
-    end
+  def each_wagon(&block)
+    @wagons.each{ |wagon| block.call(wagon)}      
   end
 
   private 

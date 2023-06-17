@@ -26,7 +26,7 @@ class Main
     @trains[0].add_wagon(CargoWagon.new(500))
     @trains[0].add_wagon(CargoWagon.new(400))
     @trains[0].add_wagon(CargoWagon.new(300))
-    @trains[2].add_wagon(PassengerWagon.new(45))
+    @trains[2].add_wagon(PassengerWagon.new(1))
     @trains[2].add_wagon(PassengerWagon.new(50))
     @trains[2].add_wagon(PassengerWagon.new(34))
     @trains[2].add_wagon(PassengerWagon.new(26))
@@ -228,8 +228,12 @@ class Main
           2. Нет'
           case gets.to_i
           when 1
-            current_wagon.take_a_seat # Занять место
-            puts 'Место Занято'
+            begin
+              current_wagon.take_a_seat # Занять место
+              puts 'Место Занято'
+            rescue RuntimeError => error
+              puts error  
+            end        
           end
         end
         break

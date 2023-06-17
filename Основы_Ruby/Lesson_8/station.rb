@@ -39,10 +39,8 @@ class Station
     false
   end
 
-  def each_train
-    for i in @trains
-      yield i
-    end
+  def each_train(&block)
+    @trains.each{|train| block.call(train)}    
   end
 
   private
@@ -57,4 +55,5 @@ end
 # st.accept_train(t1)
 # st.accept_train(t2)
 # st.accept_train(t3)
+# # st.each_train{|el| p el.inspect}
 # st.each_train{|el| el.gain_speed(70); p el }
