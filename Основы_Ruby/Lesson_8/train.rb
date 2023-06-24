@@ -1,22 +1,25 @@
+# frozen_string_literal: true
+
 require_relative 'module/manufacturer'
 require_relative 'module/instance_counter'
 require_relative 'passenger_wagon'
 require_relative 'wagon'
-class Train 
+
+class Train
   include Manufacturer
   include InstanceCounter
-  attr_reader :number, :route, :wagons, :speed, :type  
+  attr_reader :number, :route, :wagons, :speed, :type
 
-  def initialize(number) 
+  def initialize(number)
     validate!(number)
-    @number = number    
+    @number = number
     @speed = 0
     @wagons = []
-    @@all << self  
+    @@all << self
     register_instance
   end
 
-  def gain_speed (speed)
+  def gain_speed(speed)
     @speed = speed
   end
 
@@ -24,26 +27,26 @@ class Train
     self.speed = 0
   end
 
-  def assign_route (route)
+  def assign_route(route)
     @route = route
     @current_station_index = 0
-    self.current_station.accept_train(self)
-  end  
-
-  def move_next_station
-    if next_station
-      self.current_station.send_train(self)
-      self.next_station.accept_train(self)
-      self.current_station_index += 1
-    end
+    current_station.accept_train(self)
   end
 
-  def move_previous_station 
-    if previous_station
-    self.current_station.send_train(self)
-    self.previous_station.accept_train(self)
+  def move_next_station
+    return unless next_station
+
+    current_station.send_train(self)
+    next_station.accept_train(self)
+    self.current_station_index += 1
+  end
+
+  def move_previous_station
+    return unless previous_station
+
+    current_station.send_train(self)
+    previous_station.accept_train(self)
     self.current_station_index -= 1
-    end
   end
 
   def next_station
@@ -51,7 +54,7 @@ class Train
   end
 
   def previous_station
-    current_station_index == 0 ? nil : route.stations[current_station_index - 1] 
+    current_station_index.zero? ? nil : route.stations[current_station_index - 1]
   end
 
   def current_station
@@ -60,6 +63,7 @@ class Train
 
   def add_wagon(wagon)
     return unless speed.zero?
+
     @wagons << wagon if wagon.type == type
   end
 
@@ -68,38 +72,51 @@ class Train
   end
 
   def self.find(number)
-    @@all.select{ |train| train.number == number}
+    @@all.select { |train| train.number == number }
   end
 
   def valid?
-    validate!(self.number)
+    validate!(number)
     true
-  rescue
+  rescue StandardError
     false
   end
 
   def each_wagon(&block)
-    @wagons.each{ |wagon| block.call(wagon)}      
+    @wagons.each { |wagon| block.call(wagon) }
   end
 
-  private 
+  def print_wagons
+    number = -1
+    each_wagon do |wagon|
+      number += 1
+      if wagon.type == :cargo
+        puts "№ #{number}, тип #{wagon.type}, кол-во свободного объёма = #{wagon.free_volume}, занятого объема = #{wagon.fullness} "
+
+      else
+        puts "№ #{number}, тип #{wagon.type}, кол-во свободных мест = #{wagon.available_seats}, занятых мест = #{wagon.occupied_seats} "
+      end
+    end
+  end
+
+  def choose_wagon
+    current_wagon = @wagons[gets.to_i]
+    raise 'Ошибка ввода, такого вагона на существует. Выберите вагон' if current_wagon.nil?
+
+    current_wagon
+  end
+
+  private
+
   attr_accessor :current_station_index
+
   @@all = []
   @@NUMBER_TEMPLATE = /^[А-я\d]{3}-*[А-я\d]{2}$/
 
   def validate!(str)
     raise 'Строка должна содержать 5 или 6 символов' unless (5..6).include?(str.size)
-    raise 'Номер поезда не удовлетворяет шаблону, 3 буквы или цифры, не обязательный дефис, далее 2 буквы или цифры' if  str !~ @@NUMBER_TEMPLATE
+    return unless str !~ @@NUMBER_TEMPLATE
+
+    raise 'Номер поезда не удовлетворяет шаблону, 3 буквы или цифры, не обязательный дефис, далее 2 буквы или цифры'
   end
 end
-
-# st = Train.new('ККН32')
-# w1 = Wagon.new
-# w3 = Wagon.new
-# w2 = Wagon.new
-# st.type
-# st.add_wagon(w1)
-# st.add_wagon(w2)
-# st.add_wagon(w3)
-
-# p st.each_wagon{|el| p el}
