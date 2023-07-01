@@ -4,17 +4,24 @@ require_relative 'module/manufacturer'
 require_relative 'module/instance_counter'
 require_relative 'passenger_wagon'
 require_relative 'wagon'
+require_relative 'module/validation'
 
 class Train
   include Manufacturer
   include InstanceCounter
+  include Validation
+
+  validate :number, :format, /^[А-я\d]{3}-*[А-я\d]{2}$/
+  validate :number, :presence
+  validate :number, :type, String
+
   attr_reader :number, :route, :wagons, :speed, :type
 
   def initialize(number)
-    validate!(number)
     @number = number
     @speed = 0
     @wagons = []
+    validate!
     @@all << self
     register_instance
   end
@@ -73,14 +80,7 @@ class Train
 
   def self.find(number)
     @@all.select { |train| train.number == number }
-  end
-
-  def valid?
-    validate!(number)
-    true
-  rescue StandardError
-    false
-  end
+  end 
 
   def each_wagon(&block)
     @wagons.each { |wagon| block.call(wagon) }
@@ -111,12 +111,12 @@ class Train
   attr_accessor :current_station_index
 
   @@all = []
-  @@NUMBER_TEMPLATE = /^[А-я\d]{3}-*[А-я\d]{2}$/
+  # @@NUMBER_TEMPLATE = /^[А-я\d]{3}-*[А-я\d]{2}$/
 
-  def validate!(str)
-    raise 'Строка должна содержать 5 или 6 символов' unless (5..6).include?(str.size)
-    return unless str !~ @@NUMBER_TEMPLATE
+  # def validate!
+  #   raise 'Строка должна содержать 5 или 6 символов' unless (5..6).include?(@number.size)
+  #   return unless @number !~ @@NUMBER_TEMPLATE
 
-    raise 'Номер поезда не удовлетворяет шаблону, 3 буквы или цифры, не обязательный дефис, далее 2 буквы или цифры'
-  end
+  #   raise 'Номер поезда не удовлетворяет шаблону, 3 буквы или цифры, не обязательный дефис, далее 2 буквы или цифры'
+  # end
 end

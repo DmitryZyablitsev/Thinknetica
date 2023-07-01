@@ -2,9 +2,16 @@
 
 require_relative 'module/instance_counter'
 require_relative 'train'
+require_relative 'module/validation'
 
 class Station
   include InstanceCounter
+  include Validation
+
+  validate :name, :presence
+  validate :name, :length, 2
+  validate :name, :type, String
+
   def self.all
     @@stations
   end
@@ -13,11 +20,14 @@ class Station
   attr_reader :name, :trains
 
   def initialize(name)
-    validate!(name)
     @name = name
     @trains = []
-    @@stations << self
-    register_instance
+     if valid?
+      @@stations << self
+      register_instance
+    else
+      validate!
+    end
   end
 
   def accept_train(train)
@@ -32,13 +42,6 @@ class Station
     trains.delete(train)
   end
 
-  def valid?
-    validate!(name)
-    true
-  rescue StandardError
-    false
-  end
-
   def each_train(&block)
     @trains.each { |train| block.call(train) }
   end
@@ -47,11 +50,5 @@ class Station
     each_train do |train|
       puts "#{train.number}, тип - #{train.type}, количество вагонов - #{train.wagons.size}"
     end
-  end
-
-  private
-
-  def validate!(name)
-    raise 'Название станции должно быть 2 и больше символов' if name.size < 2
-  end
+  end 
 end
